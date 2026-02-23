@@ -1,0 +1,31 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "type": "npm",
+      "script": "build",
+      "group": "build",
+      "presentation": {
+        "panel": "shared",
+        "showReuseMessage": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "type": "npm",
+      "script": "dev",
+      "group": "build",
+      "isBackground": true,
+      "presentation": {
+        "panel": "shared"
+      }
+    },
+    {
+      "type": "shell",
+      "label": "Clean Build",
+      "command": "npm run clean && npm install && npm run build",
+      "group": "build",
+      "problemMatcher": []
+    }
+  ]
+}

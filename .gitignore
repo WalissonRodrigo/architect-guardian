@@ -1,0 +1,11 @@
+node_modules/
+dist/
+out/
+*.tsbuildinfo
+.turbo/
+.env
+.DS_Store
+*.log
+.cache/
+project
+.architect-guardian

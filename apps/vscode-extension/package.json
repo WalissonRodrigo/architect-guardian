@@ -1,0 +1,100 @@
+{
+  "name": "architect-guardian",
+  "displayName": "Architect Guardian",
+  "description": "MCP-based Architecture Guardian",
+  "version": "0.1.0",
+  "publisher": "WalissonRodrigo",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/WalissonRodrigo/architect-guardian"
+  },
+  "engines": {
+    "vscode": "^1.90.0"
+  },
+  "categories": [
+    "Programming Languages",
+    "Machine Learning"
+  ],
+  "activationEvents": [
+    "*"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "chatParticipants": [
+      {
+        "id": "architect-guardian",
+        "name": "architect-guardian",
+        "fullName": "Architect Guardian",
+        "description": "Consult the Architect Guardian about structural and architectural decisions.",
+        "isSticky": true
+      }
+    ],
+    "commands": [
+      {
+        "command": "architectGuardian.detectStack",
+        "title": "Detect Project Stack",
+        "category": "Architect Guardian"
+      },
+      {
+        "command": "architectGuardian.startServer",
+        "title": "Start MCP Server",
+        "category": "Architect Guardian"
+      },
+      {
+        "command": "architectGuardian.stopServer",
+        "title": "Stop MCP Server",
+        "category": "Architect Guardian"
+      },
+      {
+        "command": "architectGuardian.syncSkills",
+        "title": "Sync Architectural Skills",
+        "category": "Architect Guardian"
+      },
+      {
+        "command": "architectGuardian.verifyArchitecture",
+        "title": "Verify Architecture (Active File)",
+        "category": "Architect Guardian"
+      },
+      {
+        "command": "architectGuardian.openDashboard",
+        "title": "Open Health Dashboard",
+        "category": "Architect Guardian"
+      }
+    ],
+    "configuration": {
+      "title": "Architect Guardian",
+      "properties": {
+        "architectGuardian.serverPath": {
+          "type": "string",
+          "default": "",
+          "description": "Path to MCP server"
+        },
+        "architectGuardian.autoStart": {
+          "type": "boolean",
+          "default": true
+        }
+      }
+    }
+  },
+  "scripts": {
+    "build": "npm run compile",
+    "vscode:prepublish": "npm run package",
+    "compile": "npm run esbuild",
+    "watch": "npm run esbuild-watch",
+    "package": "npm run esbuild-package",
+    "esbuild": "esbuild ./src/extension.ts --bundle --outfile=out/extension.js --external:vscode --format=cjs --platform=node --sourcemap",
+    "esbuild-watch": "esbuild ./src/extension.ts --bundle --outfile=out/extension.js --external:vscode --format=cjs --platform=node --sourcemap --watch",
+    "esbuild-package": "esbuild ./src/extension.ts --bundle --outfile=out/extension.js --external:vscode --format=cjs --platform=node --minify",
+    "vsix": "vsce package --no-dependencies --allow-star-activation"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@types/vscode": "^1.85.0",
+    "@vscode/vsce": "^2.31.0",
+    "esbuild": "^0.19.0",
+    "typescript": "^5.3.0"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.26.0"
+  }
+}

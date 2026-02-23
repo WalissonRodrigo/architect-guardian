@@ -1,0 +1,28 @@
+name: PR Checklist Validator
+
+on:
+  pull_request:
+    types: [opened, edited, synchronize]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Check PR description
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const body = context.payload.pull_request.body || '';
+            const required = ['## Descrição', '## Tipo de mudança', '## Checklist'];
+            const missing = required.filter(r => !body.includes(r));
+            
+            if (missing.length > 0) {
+              core.setFailed(`PR description missing: ${missing.join(', ')}`);
+            }
+            
+            const unchecked = (body.match(/- \[ \]/g) || []).length;
+            if (unchecked > 0) {
+              core.warning(`${unchecked} checklist items unchecked`);
+            }

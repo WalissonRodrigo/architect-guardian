@@ -1,0 +1,13 @@
+.vscode/**
+.vscode-test/**
+out/**
+!out/extension.js
+!dist-server/**
+node_modules/**
+src/**
+.gitignore
+yarn.lock
+webpack.config.js
+webpack.config.ts
+**/*.map
+!out/extension.js.map

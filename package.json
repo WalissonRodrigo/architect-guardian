@@ -1,0 +1,28 @@
+{
+  "name": "architect-guardian",
+  "version": "0.1.0",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "build": "turbo run build",
+    "compile": "turbo run build",
+    "dev": "turbo run dev",
+    "dev:server": "turbo run dev --filter=@architect-guardian/mcp-server",
+    "dev:extension": "turbo run dev --filter=@architect-guardian/vscode-extension",
+    "lint": "turbo run lint",
+    "test": "turbo run test",
+    "clean": "rm -rf node_modules **/node_modules **/dist **/out",
+    "bootstrap": "node scripts/bootstrap.js"
+  },
+  "devDependencies": {
+    "turbo": "^2.0.0",
+    "typescript": "^5.3.0"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "packageManager": "npm@10.0.0"
+}

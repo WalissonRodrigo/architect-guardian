@@ -1,0 +1,62 @@
+{
+  "MCP Tool Handler": {
+    "prefix": "mcptool",
+    "description": "Create new MCP tool handler",
+    "body": [
+      "case \"${1:toolName}\": {",
+      "  const args = request.params.arguments as { ${2:param}: string };",
+      "  ",
+      "  // TODO: Implement ${1}",
+      "  const result = await ${3:handlerFunction}(args);",
+      "  ",
+      "  return {",
+      "    content: [{",
+      "      type: \"text\",",
+      "      text: JSON.stringify(result, null, 2)",
+      "    }]",
+      "  };",
+      "}"
+    ]
+  },
+  "MCP Server Setup": {
+    "prefix": "mcpserver",
+    "description": "Basic MCP server setup",
+    "body": [
+      "import { Server } from \"@modelcontextprotocol/sdk/server/index.js\";",
+      "import { StdioServerTransport } from \"@modelcontextprotocol/sdk/server/stdio.js\";",
+      "",
+      "const server = new Server(",
+      "  { name: \"${1:server-name}\", version: \"0.1.0\" },",
+      "  { capabilities: { tools: {} } }",
+      ");",
+      "",
+      "// Setup handlers...",
+      "",
+      "const transport = new StdioServerTransport();",
+      "await server.connect(transport);"
+    ]
+  },
+  "Skill Manifest": {
+    "prefix": "skillmanifest",
+    "description": "Create skill.yaml manifest",
+    "body": [
+      "name: ${1:skill-name}",
+      "version: 1.0.0",
+      "description: ${2:Description of what this skill does}",
+      "tags: [\"${3:tag1}\", \"${4:tag2}\"]",
+      "",
+      "detectors:",
+      "  filePatterns: [\"${5:**/*.ext}\"]",
+      "  languages: [\"${6:typescript}\"]",
+      "",
+      "capabilities:",
+      "  - name: ${7:mainCapability}",
+      "    description: ${8:What it does}",
+      "    inputSchema:",
+      "      type: object",
+      "      properties:",
+      "        ${9:param}:",
+      "          type: string"
+    ]
+  }
+}

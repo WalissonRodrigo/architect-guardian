@@ -1,0 +1,49 @@
+# Architect Guardian - Meta-contrato
+name: "architect-guardian"
+version: "0.1.0"
+description: "MCP-based Architecture Guardian"
+
+created_at: "2026-02-22"
+last_review: "2026-02-22"
+
+stack:
+  language: "TypeScript"
+  runtime: "Node.js 20+"
+  primary_ide: "VS Code"
+  ai_assistant: "Antigravity + Gemini"
+
+adopted_patterns:
+  - name: "Clean Architecture"
+    scope: "mcp-server"
+    strictness: "enforce"
+  - name: "Modular Monorepo"
+    scope: "global"
+    strictness: "enforce"
+
+rejected_patterns:
+  - "Singleton para estado global"
+  - "Any types não justificados"
+
+quality_gates:
+  typescript:
+    strict: true
+    noImplicitAny: true
+  testing:
+    coverage_threshold: 70
+
+ai_workflow:
+  phase_0_foundation:
+    model: "gemini-3.1-pro-preview"
+    use_for: ["Arquitetura", "APIs", "Protocolos"]
+  phase_1_mvp:
+    model: "gemini-3-pro-preview"
+    handoff_to_flash_after: "Estrutura estável"
+  phase_2_refinement:
+    model: "gemini-3-flash-preview"
+    use_for: ["Iterações", "Refatorações", "Bug fixes"]
+
+validation_gates:
+  phase_0:
+    - "MCP Server responde via Inspector"
+    - "Extensão VS Code carrega sem erros"
+    - "Comando 'Detect Stack' abre webview"

@@ -1,0 +1,14 @@
+# Global owners
+* @WalissonRodrigo
+
+# MCP Server
+/apps/mcp-server/ @WalissonRodrigo @backend-team
+
+# VS Code Extension  
+/apps/vscode-extension/ @WalissonRodrigo @frontend-team
+
+# Shared packages
+/packages/ @WalissonRodrigo
+
+# Skills registry
+/skills-registry/ @community-managers

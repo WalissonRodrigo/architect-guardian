@@ -1,0 +1,34 @@
+{
+  "version": "1.0.0",
+  "default_preset": "implementation",
+  "context_detection": {
+    "enabled": true,
+    "auto_switch_preset": true
+  },
+  "code_generation": {
+    "include_types": true,
+    "include_tests": true,
+    "include_error_handling": true,
+    "max_file_size_lines": 300,
+    "split_large_files": true
+  },
+  "validation": {
+    "run_eslint_on_generated": true,
+    "check_typescript_errors": true,
+    "require_export_default": false
+  },
+  "documentation": {
+    "language": "pt-BR",
+    "include_jsdoc": true,
+    "include_examples": true
+  },
+  "project_specific": {
+    "mcp_protocol_version": "1.0.0",
+    "supported_ides": [
+      "vscode",
+      "cursor",
+      "windsurf"
+    ],
+    "skill_schema_version": "1.0.0"
+  }
+}

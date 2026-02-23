@@ -1,0 +1,11 @@
+{
+  "recommendations": [
+    "dbaeumer.vscode-eslint",
+    "esbenp.prettier-vscode",
+    "yoavbls.pretty-ts-errors",
+    "ms-vscode.vscode-typescript-next",
+    "hbenl.vscode-test-explorer",
+    "eamodio.gitlens",
+    "antigravity.antigravity"
+  ]
+}

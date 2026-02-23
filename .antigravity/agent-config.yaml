@@ -1,0 +1,35 @@
+agents:
+  - name: "Architect-Guardian-Core"
+    description: "Sistema MCP para governança arquitetural inteligente"
+    model: "gemini-3.1-pro-preview"
+    context_window: "1M tokens"
+    max_output_per_session: "8192 tokens"
+    tools:
+      - "git-sync"
+      - "skill-engine"
+      - "code-inspector"
+      - "project-analyzer"
+      - "documentation-generator"
+    behavior:
+      - "Sempre validar .architect.yml antes de qualquer ação"
+      - "Usar Git Sync para obter skills dinamicamente"
+      - "Aplicar padrões arquiteturais em todas as sugestões"
+      - "Gerar documentação completa em português"
+    handoffs:
+      - "Ao implementar features complexas, passar para Skill Engine"
+      - "Após implementação, passar para Code Inspector"
+      - "Antes de finalizar, passar para Documentation Generator"
+
+  - name: "Skill-Developer"
+    description: "Desenvolvimento de novas skills para o ecossistema"
+    model: "gemini-3.1-pro-preview"
+    context_window: "1M tokens"
+    max_output_per_session: "8192 tokens"
+    tools:
+      - "git-sync"
+      - "skill-engine"
+    behavior:
+      - "Sempre seguir .architect.yml"
+      - "Desenvolver skills modulares e reutilizáveis"
+      - "Incluir testes unitários para cada skill"
+      - "Documentar implementação em português"

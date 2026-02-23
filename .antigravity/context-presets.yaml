@@ -1,0 +1,37 @@
+presets:
+  - name: "architecture"
+    description: "Contexto de arquitetura e design de sistemas"
+    priority: 10
+    files:
+      - ".architect.yml"
+      - "docs/architecture/**/*.md"
+      - "docs/decisions/**/*.md"
+      - "packages/shared-types/src/**/*.ts"
+      - "apps/mcp-server/src/config/**/*.ts"
+      
+  - name: "implementation"
+    description: "Contexto de implementação de features"
+    priority: 5
+    files:
+      - "apps/mcp-server/src/**/*.ts"
+      - "apps/vscode-extension/src/**/*.ts"
+      - "skills/**/*.yaml"
+      - "skills/**/*.md"
+      
+  - name: "testing"
+    description: "Contexto de testes e qualidade"
+    priority: 3
+    files:
+      - "apps/mcp-server/src/**/*.test.ts"
+      - "apps/mcp-server/src/**/*.spec.ts"
+      - "apps/vscode-extension/src/**/*.test.ts"
+      - "apps/vscode-extension/src/**/*.spec.ts"
+      
+  - name: "documentation"
+    description: "Contexto de documentação"
+    priority: 2
+    files:
+      - "docs/**/*.md"
+      - "skills/**/*.md"
+      - "README.md"
+      - "CHANGELOG.md"

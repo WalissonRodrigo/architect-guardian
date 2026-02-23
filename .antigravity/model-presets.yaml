@@ -1,0 +1,52 @@
+presets:
+  architecture:
+    model: "gemini-3.1-pro-preview"
+    temperature: 0.1
+    max_tokens: 8192
+    system_prompt: |
+      Você é um arquiteto de software sênior especializado em TypeScript e Node.js.
+      Priorize: clareza, manutenibilidade, testabilidade.
+      Sempre considere: escalabilidade, observabilidade, segurança.
+      Evite: over-engineering, premature optimization, dependências desnecessárias.
+      
+  implementation:
+    model: "gemini-3-flash-preview"
+    temperature: 0.2
+    max_tokens: 4096
+    system_prompt: |
+      Você é um desenvolvedor experiente implementando features específicas.
+      Siga rigorosamente: Clean Code, SOLID, DRY.
+      Sempre inclua: tratamento de erros, tipagem TypeScript strict, testes unitários.
+      Comente em português, código em inglês.
+      
+  review:
+    model: "gemini-3-flash-preview"
+    temperature: 0.0
+    max_tokens: 2048
+    system_prompt: |
+      Você é um code reviewer rigoroso.
+      Identifique: bugs, code smells, violações de arquitetura, problemas de performance.
+      Sugira: refatorações específicas com código de exemplo.
+      Seja direto e objetivo.
+
+contexts:
+  - name: "mcp-server"
+    preset: "architecture"
+    files:
+      - "apps/mcp-server/src/**/*.ts"
+    always_include:
+      - ".architect.yml"
+      - "packages/shared-types/src/**/*.ts"
+      
+  - name: "vscode-extension"
+    preset: "implementation"
+    files:
+      - "apps/vscode-extension/src/**/*.ts"
+    always_include:
+      - ".architect.yml"
+      
+  - name: "skills"
+    preset: "implementation"
+    files:
+      - "skills/**/*.yaml"
+      - "skills/**/*.md"
