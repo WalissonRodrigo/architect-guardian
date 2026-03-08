@@ -15,17 +15,34 @@ export class ProjectDetector {
     const manifests = await this.extractManifests(projectPath, detectedFiles);
     const readme = await this.extractReadme(projectPath, detectedFiles);
 
-    // Fallback for tools expecting backward compatibility
-    // We leave these largely blank since the true intelligence happens on the Client/LLM side now
+    // Basic heuristic for tests
+    let language: string | null = 'Dynamic via AI';
+    let packageManager: string | null = 'Pending AI Analysis';
+
+    if (manifests['package.json']) {
+      language = 'TypeScript'; // Default for our stack, or detected via files
+      packageManager = 'npm';
+      if (detectedFiles.some((f) => f.endsWith('.ts') || f.endsWith('.tsx')))
+        language = 'TypeScript';
+      else if (detectedFiles.some((f) => f.endsWith('.js') || f.endsWith('.jsx')))
+        language = 'JavaScript';
+    } else if (manifests['requirements.txt'] || manifests['pyproject.toml']) {
+      language = 'Python';
+      packageManager = 'pip';
+    } else if (manifests['pom.xml'] || manifests['build.gradle']) {
+      language = 'Java';
+      packageManager = manifests['pom.xml'] ? 'maven' : 'gradle';
+    }
+
     return {
-      language: 'Dynamic via AI',
+      language,
       framework: 'Pending AI Analysis',
-      packageManager: 'Pending AI Analysis',
-      hasTests: detectedFiles.some((f) => f.includes('test')),
+      packageManager,
+      hasTests: detectedFiles.some((f) => f.toLowerCase().includes('test') || f.includes('spec')),
       hasDocker: detectedFiles.some((f) => f.includes('docker') || f.includes('Docker')),
       hasCI: detectedFiles.some((f) => f.includes('.github') || f.includes('gitlab-ci')),
       detectedFiles: detectedFiles.slice(0, 50),
-      confidence: 'medium',
+      confidence: language !== 'Dynamic via AI' ? 'high' : 'medium',
       rawContext: {
         directoryTree: detectedFiles,
         manifests,

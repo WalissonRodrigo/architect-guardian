@@ -2,24 +2,22 @@
 
 MCP-based Architecture Guardian for intelligent code assistance.
 
-## 🚀 Quick Start
+## 🚀 Instalação Rápida
+
+O Architect Guardian pode ser instalado em qualquer IDE moderna (Trae, VS Code, Windsurf, Claude Desktop, etc.) através do nosso CLI oficial:
 
 ```bash
-# 1. Execute o init script
-./init-architect-guardian.sh meu-projeto WalissonRodrigo
-cd meu-projeto
+# Para Claude Desktop
+npx @architect-guardian/mcp-server setup-claude
 
-# 2. Instale dependências
-npm install
-
-# 3. Build
-npm run build
-
-# 4. Desenvolva com Antigravity
-# Use: .architect-guardian/prompts/phases/phase-0-foundation/01-setup-complete.md
+# Para VS Code / Trae
+# 1. Baixe o .vsix em Releases
+# 2. Instale manualmente no VS Code/Trae
 ```
 
-## 📁 Estrutura
+Consulte o [Guia de Instalação (INSTALL.md)](file:///mnt/d/Walisson%20Rodrigo/Documents/WR%20Systems/architect-guardian/INSTALL.md) para detalhes de cada plataforma.
+
+## 📁 Estrutura do Monorepo
 
 - `apps/mcp-server` - Servidor MCP
 - `apps/vscode-extension` - Extensão VS Code

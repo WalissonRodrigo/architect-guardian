@@ -4,6 +4,7 @@
   "description": "MCP-based Architecture Guardian",
   "version": "0.1.0",
   "type": "module",
+  "license": "MIT",
   "publisher": "WalissonRodrigo",
   "repository": {
     "type": "git",
