@@ -4,7 +4,7 @@
 
 export interface ProjectAnalysis {
   path: string;
-  stack: import("./skill.js").ProjectStack;
+  stack: import('./skill.js').ProjectStack;
   architecture?: ArchitectureAnalysis;
   quality?: QualityMetrics;
   timestamp: Date;
@@ -24,7 +24,7 @@ export interface DetectedPattern {
 
 export interface ArchitectureViolation {
   rule: string;
-  severity: "error" | "warning" | "info";
+  severity: 'error' | 'warning' | 'info';
   file?: string;
   line?: number;
   message: string;

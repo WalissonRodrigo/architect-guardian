@@ -3,6 +3,7 @@
   "displayName": "Architect Guardian",
   "description": "MCP-based Architecture Guardian",
   "version": "0.1.0",
+  "type": "module",
   "publisher": "WalissonRodrigo",
   "repository": {
     "type": "git",
@@ -59,6 +60,11 @@
         "command": "architectGuardian.openDashboard",
         "title": "Open Health Dashboard",
         "category": "Architect Guardian"
+      },
+      {
+        "command": "architectGuardian.addCustomSkill",
+        "title": "Add Custom Architectural Skill",
+        "category": "Architect Guardian"
       }
     ],
     "configuration": {
@@ -77,8 +83,9 @@
     }
   },
   "scripts": {
-    "build": "npm run compile",
-    "vscode:prepublish": "npm run package",
+    "build": "npm run build:server && npm run compile",
+    "build:server": "node ./scripts/build-server.js",
+    "vscode:prepublish": "npm run build && npm run package",
     "compile": "npm run esbuild",
     "watch": "npm run esbuild-watch",
     "package": "npm run esbuild-package",
@@ -88,10 +95,11 @@
     "vsix": "vsce package --no-dependencies --allow-star-activation"
   },
   "devDependencies": {
+    "@architect-guardian/mcp-server": "*",
     "@types/node": "^20.0.0",
     "@types/vscode": "^1.85.0",
     "@vscode/vsce": "^2.31.0",
-    "esbuild": "^0.19.0",
+    "esbuild": "^0.27.3",
     "typescript": "^5.3.0"
   },
   "dependencies": {

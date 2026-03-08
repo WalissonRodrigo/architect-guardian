@@ -2,67 +2,67 @@ import * as vscode from 'vscode';
 import { MCPServerManager } from './mcpServerManager';
 
 export class HealthDashboardProvider {
-    public static readonly viewType = 'architectGuardian.healthDashboard';
+  public static readonly viewType = 'architectGuardian.healthDashboard';
 
-    constructor(
-        private readonly context: vscode.ExtensionContext,
-        private readonly serverManager: MCPServerManager
-    ) {}
+  constructor(
+    private readonly context: vscode.ExtensionContext,
+    private readonly serverManager: MCPServerManager,
+  ) {}
 
-    public show() {
-        const panel = vscode.window.createWebviewPanel(
-            HealthDashboardProvider.viewType,
-            'Architectural Health Dashboard',
-            vscode.ViewColumn.One,
-            {
-                enableScripts: true,
-                retainContextWhenHidden: true
-            }
-        );
+  public show() {
+    const panel = vscode.window.createWebviewPanel(
+      HealthDashboardProvider.viewType,
+      'Architectural Health Dashboard',
+      vscode.ViewColumn.One,
+      {
+        enableScripts: true,
+        retainContextWhenHidden: true,
+      },
+    );
 
-        panel.webview.html = this.getHtmlForWebview(panel.webview);
-        this.updateDashboard(panel);
+    panel.webview.html = this.getHtmlForWebview(panel.webview);
+    this.updateDashboard(panel);
+  }
+
+  private async updateDashboard(panel: vscode.WebviewPanel) {
+    const client = this.serverManager.getClient();
+    if (!client) return;
+
+    try {
+      // Request full project analysis
+      const rootPath = vscode.workspace.workspaceFolders?.[0].uri.fsPath;
+      if (!rootPath) return;
+
+      const result = await client.callTool({
+        name: 'detect_project_stack',
+        arguments: { path: rootPath },
+      });
+
+      const stack = JSON.parse((result.content as any)[0].text);
+
+      // Send data to webview
+      panel.webview.postMessage({
+        type: 'update',
+        stack,
+        healthScore: this.calculateHealthScore(stack),
+      });
+    } catch (error) {
+      console.error('Failed to update dashboard:', error);
     }
+  }
 
-    private async updateDashboard(panel: vscode.WebviewPanel) {
-        const client = this.serverManager.getClient();
-        if (!client) return;
+  private calculateHealthScore(stack: any): number {
+    let score = 100;
+    if (stack.confidence === 'medium') score -= 10;
+    if (stack.confidence === 'low') score -= 30;
+    if (!stack.hasTests) score -= 20;
+    if (!stack.hasCI) score -= 10;
+    if (!stack.hasDocker) score -= 5;
+    return Math.max(0, score);
+  }
 
-        try {
-            // Request full project analysis
-            const rootPath = vscode.workspace.workspaceFolders?.[0].uri.fsPath;
-            if (!rootPath) return;
-
-            const result = await client.callTool({
-                name: 'detect_project_stack',
-                arguments: { path: rootPath }
-            });
-
-            const stack = JSON.parse((result.content as any)[0].text);
-            
-            // Send data to webview
-            panel.webview.postMessage({
-                type: 'update',
-                stack,
-                healthScore: this.calculateHealthScore(stack)
-            });
-        } catch (error) {
-            console.error('Failed to update dashboard:', error);
-        }
-    }
-
-    private calculateHealthScore(stack: any): number {
-        let score = 100;
-        if (stack.confidence === 'medium') score -= 10;
-        if (stack.confidence === 'low') score -= 30;
-        if (!stack.hasTests) score -= 20;
-        if (!stack.hasCI) score -= 10;
-        if (!stack.hasDocker) score -= 5;
-        return Math.max(0, score);
-    }
-
-    private getHtmlForWebview(webview: vscode.Webview): string {
-        return `
+  private getHtmlForWebview(webview: vscode.Webview): string {
+    return `
             <!DOCTYPE html>
             <html lang="en">
             <head>
@@ -109,5 +109,5 @@ export class HealthDashboardProvider {
             </body>
             </html>
         `;
-    }
+  }
 }

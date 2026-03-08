@@ -28,11 +28,11 @@ npm run build
 
 ## 🧠 Desenvolvimento com IA
 
-| Fase | Modelo | Prompt |
-|------|--------|--------|
-| 0 | Gemini 3.1 Pro | `.architect-guardian/prompts/phases/phase-0-foundation/01-setup-complete.md` |
-| 1 | Gemini 3.1 Pro → 2.0 Flash | (a criar) |
-| 2 | Gemini 3 Flash | (a criar) |
+| Fase | Modelo                     | Prompt                                                                       |
+| ---- | -------------------------- | ---------------------------------------------------------------------------- |
+| 0    | Gemini 3.1 Pro             | `.architect-guardian/prompts/phases/phase-0-foundation/01-setup-complete.md` |
+| 1    | Gemini 3.1 Pro → 2.0 Flash | (a criar)                                                                    |
+| 2    | Gemini 3 Flash             | (a criar)                                                                    |
 
 ## 🛣️ Roadmap
 

@@ -1,7 +1,7 @@
-import { ProjectStack } from "@architect-guardian/shared-types";
-import * as fs from "fs/promises";
-import * as path from "path";
-import { ASTAnalyzer } from "./ASTAnalyzer.js";
+import { ProjectStack } from '@architect-guardian/shared-types';
+import * as fs from 'fs/promises';
+import * as path from 'path';
+import { ASTAnalyzer } from './ASTAnalyzer.js';
 
 export class ProjectDetector {
   private astAnalyzer: ASTAnalyzer;
@@ -18,18 +18,14 @@ export class ProjectDetector {
     // Fallback for tools expecting backward compatibility
     // We leave these largely blank since the true intelligence happens on the Client/LLM side now
     return {
-      language: "Dynamic via AI",
-      framework: "Pending AI Analysis",
-      packageManager: "Pending AI Analysis",
-      hasTests: detectedFiles.some((f) => f.includes("test")),
-      hasDocker: detectedFiles.some(
-        (f) => f.includes("docker") || f.includes("Docker"),
-      ),
-      hasCI: detectedFiles.some(
-        (f) => f.includes(".github") || f.includes("gitlab-ci"),
-      ),
+      language: 'Dynamic via AI',
+      framework: 'Pending AI Analysis',
+      packageManager: 'Pending AI Analysis',
+      hasTests: detectedFiles.some((f) => f.includes('test')),
+      hasDocker: detectedFiles.some((f) => f.includes('docker') || f.includes('Docker')),
+      hasCI: detectedFiles.some((f) => f.includes('.github') || f.includes('gitlab-ci')),
       detectedFiles: detectedFiles.slice(0, 50),
-      confidence: "medium",
+      confidence: 'medium',
       rawContext: {
         directoryTree: detectedFiles,
         manifests,
@@ -43,43 +39,41 @@ export class ProjectDetector {
     files: string[],
   ): Promise<Record<string, string>> {
     const manifestNames = [
-      "package.json",
-      "pom.xml",
-      "build.gradle",
-      "build.gradle.kts",
-      "CMakeLists.txt",
-      "Cargo.toml",
-      "go.mod",
-      "requirements.txt",
-      "pyproject.toml",
-      "composer.json",
+      'package.json',
+      'pom.xml',
+      'build.gradle',
+      'build.gradle.kts',
+      'CMakeLists.txt',
+      'Cargo.toml',
+      'go.mod',
+      'requirements.txt',
+      'pyproject.toml',
+      'composer.json',
     ];
 
     const results: Record<string, string> = {};
     for (const m of manifestNames) {
       if (files.includes(m)) {
         try {
-          const content = await fs.readFile(path.join(projectPath, m), "utf8");
+          const content = await fs.readFile(path.join(projectPath, m), 'utf8');
           results[m] = content.substring(0, 8000); // Cap at 8KB to avoid token overload
-        } catch (e) {}
+        } catch (e) {
+          // Ignore
+        }
       }
     }
     return results;
   }
 
-  private async extractReadme(
-    projectPath: string,
-    files: string[],
-  ): Promise<string | undefined> {
-    const readmeFile = files.find((f) => f.toLowerCase() === "readme.md");
+  private async extractReadme(projectPath: string, files: string[]): Promise<string | undefined> {
+    const readmeFile = files.find((f) => f.toLowerCase() === 'readme.md');
     if (readmeFile) {
       try {
-        const content = await fs.readFile(
-          path.join(projectPath, readmeFile),
-          "utf8",
-        );
+        const content = await fs.readFile(path.join(projectPath, readmeFile), 'utf8');
         return content.substring(0, 3000); // Cap at 3KB for context
-      } catch (e) {}
+      } catch (e) {
+        // Ignore
+      }
     }
     return undefined;
   }
@@ -97,23 +91,23 @@ export class ProjectDetector {
         if (entry.isDirectory()) {
           if (
             [
-              "node_modules",
-              ".git",
-              "dist",
-              "out",
-              "build",
-              "target",
-              "vendor",
-              ".idea",
-              ".vscode",
-              "coverage",
-              "__pycache__",
-              "venv",
-              ".env",
+              'node_modules',
+              '.git',
+              'dist',
+              'out',
+              'build',
+              'target',
+              'vendor',
+              '.idea',
+              '.vscode',
+              'coverage',
+              '__pycache__',
+              'venv',
+              '.env',
             ].includes(entry.name)
           )
             continue;
-          files.push(entry.name + "/");
+          files.push(entry.name + '/');
           const subEntries = await this.listAllFiles(
             path.join(dir, entry.name),
             currentDepth + 1,
@@ -125,7 +119,7 @@ export class ProjectDetector {
         }
       }
     } catch (e) {
-      console.error("Error listing files:", e);
+      console.error('Error listing files:', e);
     }
     return files;
   }

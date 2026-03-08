@@ -1,4 +1,4 @@
-import { ArchitecturalPattern } from "./manifest.js";
+import { ArchitecturalPattern } from './manifest.js';
 
 /**
  * Skill system types
@@ -75,7 +75,7 @@ export interface ProjectStack {
   hasDocker: boolean;
   hasCI: boolean;
   detectedFiles: string[];
-  confidence: "high" | "medium" | "low";
+  confidence: 'high' | 'medium' | 'low';
   architecturalPattern?: string;
   reasoning?: string;
   rawContext?: {

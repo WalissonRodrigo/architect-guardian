@@ -1,0 +1,13 @@
+node_modules
+dist
+out
+*.vsix
+package-lock.json
+.vscode
+.antigravity
+.architect-guardian
+.github
+docs
+scripts
+demo-project
+test-fixtures

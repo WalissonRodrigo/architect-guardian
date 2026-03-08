@@ -1,11 +1,11 @@
 name: atomic-design-checker
 version: 1.0.0
 description: Valida se a estrutura de componentes segue o Atomic Design
-tags: ["frontend", "atomic-design", "clean-architecture"]
+tags: ['frontend', 'atomic-design', 'clean-architecture']
 
 detectors:
-  filePatterns: ["src/components/**/*.tsx", "src/components/**/*.jsx"]
-  languages: ["typescript", "javascript"]
+  filePatterns: ['src/components/**/*.tsx', 'src/components/**/*.jsx']
+  languages: ['typescript', 'javascript']
 
 capabilities:
   - name: validate_structure

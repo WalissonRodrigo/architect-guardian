@@ -1,37 +1,37 @@
-import { CallToolResultSchema } from "@modelcontextprotocol/sdk/types.js";
-import * as vscode from "vscode";
-import { MCPServerManager } from "../mcpServerManager";
+import { CallToolResultSchema } from '@modelcontextprotocol/sdk/types.js';
+import * as vscode from 'vscode';
+import { MCPServerManager } from '../mcpServerManager';
 
 export async function detectStack(manager: MCPServerManager) {
   const client = manager.getClient();
   if (!client) {
     const action = await vscode.window.showErrorMessage(
-      "MCP Server is not running",
-      "Start Server",
+      'MCP Server is not running',
+      'Start Server',
     );
-    if (action === "Start Server") {
-      await vscode.commands.executeCommand("architectGuardian.startServer");
+    if (action === 'Start Server') {
+      await vscode.commands.executeCommand('architectGuardian.startServer');
     }
     return;
   }
 
   const workspaceRoot = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
   if (!workspaceRoot) {
-    vscode.window.showErrorMessage("No workspace folder open");
+    vscode.window.showErrorMessage('No workspace folder open');
     return;
   }
 
   await vscode.window.withProgress(
     {
       location: vscode.ProgressLocation.Notification,
-      title: "Scanning Project Structure (MCP Server)...",
+      title: 'Scanning Project Structure (MCP Server)...',
       cancellable: false,
     },
     async () => {
       try {
         const result = await client.callTool(
           {
-            name: "detect_project_stack",
+            name: 'detect_project_stack',
             arguments: { path: workspaceRoot },
           },
           CallToolResultSchema,
@@ -42,20 +42,16 @@ export async function detectStack(manager: MCPServerManager) {
         vscode.window.withProgress(
           {
             location: vscode.ProgressLocation.Notification,
-            title: "Analyzing Stack using Copilot AI...",
+            title: 'Analyzing Stack using Copilot AI...',
             cancellable: false,
           },
           async () => {
             try {
-              const analyzedData = await analyzeWithLM(
-                rawData?.rawContext || rawData,
-              );
+              const analyzedData = await analyzeWithLM(rawData?.rawContext || rawData);
               analyzedData.detectedFiles = rawData.detectedFiles || [];
               showWebView(analyzedData);
             } catch (lmError: any) {
-              vscode.window.showErrorMessage(
-                `AI Analysis failed: ${lmError.message}`,
-              );
+              vscode.window.showErrorMessage(`AI Analysis failed: ${lmError.message}`);
             }
           },
         );
@@ -67,7 +63,7 @@ export async function detectStack(manager: MCPServerManager) {
 }
 
 async function analyzeWithLM(rawPayload: any): Promise<any> {
-  const models = await vscode.lm.selectChatModels({ family: "gpt-4o" });
+  const models = await vscode.lm.selectChatModels({ family: 'gpt-4o' });
   let model = models[0];
   if (!model) {
     const anyModels = await vscode.lm.selectChatModels({});
@@ -75,7 +71,7 @@ async function analyzeWithLM(rawPayload: any): Promise<any> {
   }
 
   if (!model) {
-    throw new Error("No language model available (Copilot not active).");
+    throw new Error('No language model available (Copilot not active).');
   }
 
   const systemPrompt = `You are a Senior Software Architect. Analyze the following deep project structure and manifest files carefully.
@@ -101,9 +97,7 @@ Schema:
 
   const messages = [
     vscode.LanguageModelChatMessage.User(systemPrompt),
-    vscode.LanguageModelChatMessage.User(
-      JSON.stringify(rawPayload).substring(0, 16000),
-    ), // Cap just in case
+    vscode.LanguageModelChatMessage.User(JSON.stringify(rawPayload).substring(0, 16000)), // Cap just in case
   ];
 
   const response = await model.sendRequest(
@@ -112,39 +106,35 @@ Schema:
     new vscode.CancellationTokenSource().token,
   );
 
-  let resultText = "";
+  let resultText = '';
   for await (const fragment of response.text) {
     resultText += fragment;
   }
 
   resultText = resultText
-    .replace(/```json/g, "")
-    .replace(/```/g, "")
+    .replace(/```json/g, '')
+    .replace(/```/g, '')
     .trim();
   return JSON.parse(resultText);
 }
 
 function showWebView(data: any) {
   const panel = vscode.window.createWebviewPanel(
-    "projectStack",
-    "Architect Guardian - Project Stack",
+    'projectStack',
+    'Architect Guardian - Project Stack',
     vscode.ViewColumn.One,
     { enableScripts: true },
   );
 
   panel.webview.onDidReceiveMessage(async (message) => {
-    if (message.command === "saveDossier") {
-      const { saveDossier } = await import("./saveDossier.js");
+    if (message.command === 'saveDossier') {
+      const { saveDossier } = await import('./saveDossier.js');
       await saveDossier(data);
     }
   });
 
   const confidenceColor =
-    data.confidence === "high"
-      ? "#4ec9b0"
-      : data.confidence === "medium"
-        ? "#dcdcaa"
-        : "#f44747";
+    data.confidence === 'high' ? '#4ec9b0' : data.confidence === 'medium' ? '#dcdcaa' : '#f44747';
   const jsonResult = JSON.stringify(data, null, 2);
 
   panel.webview.html = `
@@ -174,16 +164,16 @@ function showWebView(data: any) {
         <h1>🏛️ Architect Guardian</h1>
         
         <div class="card">
-          <div style="margin-bottom: 10px;"><span class="label">Project Language:</span> <span class="value">${data.language || "Unknown"}</span></div>
-          <div style="margin-bottom: 10px;"><span class="label">Main Framework:</span> <span class="value">${data.framework || "None detected"}</span></div>
-          <div style="margin-bottom: 10px;"><span class="label">Package Manager:</span> <span class="value">${data.packageManager || "Unknown"}</span></div>
-          <div style="margin-bottom: 10px;"><span class="label">Architecture:</span> <span class="value">${data.architecturalPattern || "Standard"}</span></div>
+          <div style="margin-bottom: 10px;"><span class="label">Project Language:</span> <span class="value">${data.language || 'Unknown'}</span></div>
+          <div style="margin-bottom: 10px;"><span class="label">Main Framework:</span> <span class="value">${data.framework || 'None detected'}</span></div>
+          <div style="margin-bottom: 10px;"><span class="label">Package Manager:</span> <span class="value">${data.packageManager || 'Unknown'}</span></div>
+          <div style="margin-bottom: 10px;"><span class="label">Architecture:</span> <span class="value">${data.architecturalPattern || 'Standard'}</span></div>
           <div><span class="label">Detection Confidence:</span> <span class="confidence">${data.confidence}</span></div>
         </div>
 
         <div class="card">
           <h3 style="margin-top: 0; margin-bottom: 15px;">Architect's Reasoning</h3>
-          <p style="font-size: 14px; color: var(--vscode-descriptionForeground); margin: 0;">${data.reasoning || "AI inferred the stack based on detected manifest files and directory topology."}</p>
+          <p style="font-size: 14px; color: var(--vscode-descriptionForeground); margin: 0;">${data.reasoning || 'AI inferred the stack based on detected manifest files and directory topology.'}</p>
         </div>
 
         <div class="card" style="text-align: center; background: none; border: 1px dashed var(--vscode-button-background);">
@@ -206,7 +196,7 @@ function showWebView(data: any) {
 
         <div class="footer">
           Architect Guardian Phase 2 - Refinement 🔥<br>
-          ${data._from_cache ? "⚡ Result loaded from high-speed cache" : "🔍 Fresh detection performed"}
+          ${data._from_cache ? '⚡ Result loaded from high-speed cache' : '🔍 Fresh detection performed'}
         </div>
       </div>
       <script>hljs.highlightAll();</script>

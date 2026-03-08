@@ -1,11 +1,11 @@
 name: ddd-boundary-enforcer
 version: 1.0.0
 description: Garante que a lógica de domínio não vaze para infraestrutura
-tags: ["backend", "ddd", "architectural-boundary"]
+tags: ['backend', 'ddd', 'architectural-boundary']
 
 detectors:
-  filePatterns: ["src/domain/**/*.ts", "src/infrastructure/**/*.ts"]
-  languages: ["typescript"]
+  filePatterns: ['src/domain/**/*.ts', 'src/infrastructure/**/*.ts']
+  languages: ['typescript']
 
 capabilities:
   - name: check_imports

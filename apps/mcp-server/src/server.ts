@@ -1,25 +1,23 @@
 #!/usr/bin/env node
 
-import { Server } from "@modelcontextprotocol/sdk/server/index.js";
-import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
-import {
-  CallToolRequestSchema,
-  ListToolsRequestSchema,
-} from "@modelcontextprotocol/sdk/types.js";
-import * as os from "os";
-import * as path from "path";
-import { CacheManager } from "./cache/CacheManager.js";
-import { FileWatcher } from "./engine/FileWatcher.js";
-import { SkillEngine } from "./engine/SkillEngine.js";
-import { ProjectDetector } from "./skills/detectors/ProjectDetector.js";
-import { ConfigManager } from "./sync/ConfigManager.js";
-import { GitSyncEngine } from "./sync/GitSyncEngine.js";
+import { Server } from '@modelcontextprotocol/sdk/server/index.js';
+import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
+import { CallToolRequestSchema, ListToolsRequestSchema } from '@modelcontextprotocol/sdk/types.js';
+import * as fs from 'fs/promises';
+import * as os from 'os';
+import * as path from 'path';
+import { CacheManager } from './cache/CacheManager.js';
+import { FileWatcher } from './engine/FileWatcher.js';
+import { SkillEngine } from './engine/SkillEngine.js';
+import { ProjectDetector } from './skills/detectors/ProjectDetector.js';
+import { ConfigManager } from './sync/ConfigManager.js';
+import { GitSyncEngine } from './sync/GitSyncEngine.js';
 
 const transport = new StdioServerTransport();
 const server = new Server(
   {
-    name: "architect-guardian",
-    version: "0.1.0",
+    name: 'architect-guardian',
+    version: '0.1.0',
   },
   {
     capabilities: {
@@ -30,36 +28,102 @@ const server = new Server(
 
 const cacheManager = new CacheManager();
 const syncEngine = new GitSyncEngine();
-const skillEngine = new SkillEngine(
-  path.join(os.homedir(), ".architect-guardian", "skills"),
-);
+const skillEngine = new SkillEngine();
 const projectDetector = new ProjectDetector();
 
 // Error handling for registry updates
 const watcher = new FileWatcher(
-  path.join(os.homedir(), ".architect-guardian", "skills"),
+  path.join(os.homedir(), '.architect-guardian', 'skills'),
   async () => {
-    console.error("Skills registry updated, reloading...");
+    console.error('Skills registry updated, reloading...');
   },
 );
 
 server.setRequestHandler(ListToolsRequestSchema, async () => {
-  const skills = await syncEngine.listCachedSkills();
-  return {
-    tools: skills.map((skill) => ({
-      name: skill.name,
-      description: skill.description,
-      inputSchema: skill.capabilities[0].inputSchema,
-    })),
-  };
+  const skillLocations = await syncEngine.listCachedSkills();
+  const tools = skillLocations.map((loc) => ({
+    name: loc.manifest.name,
+    description: loc.manifest.description,
+    inputSchema: {
+      type: 'object',
+      properties: {
+        projectPath: { type: 'string' },
+        ...(loc.manifest.capabilities[0].inputSchema.properties as any),
+      },
+      required: [
+        'projectPath',
+        ...((loc.manifest.capabilities[0].inputSchema.required as string[]) || []),
+      ],
+    },
+  }));
+
+  // Add system tools
+  tools.push({
+    name: 'add_custom_skill',
+    description: 'Add a new custom skill to the local registry',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        name: { type: 'string' },
+        description: { type: 'string' },
+        prompt: { type: 'string' },
+        language: { type: 'string' },
+      },
+      required: ['name', 'description', 'prompt'],
+    } as any,
+  });
+
+  return { tools };
 });
 
 server.setRequestHandler(CallToolRequestSchema, async (request) => {
   try {
-    const skills = await syncEngine.listCachedSkills();
-    const skill = skills.find((s) => s.name === request.params.name);
+    if (request.params.name === 'add_custom_skill') {
+      const args = request.params.arguments as any;
+      const localSkillsPath = path.join(
+        os.homedir(),
+        '.architect-guardian',
+        'skills',
+        'local',
+        'skills',
+      );
+      const skillPath = path.join(localSkillsPath, args.name);
+      await fs.mkdir(skillPath, { recursive: true });
 
-    if (!skill) {
+      const manifest = {
+        name: args.name,
+        version: '0.1.0',
+        description: args.description,
+        tags: ['custom'],
+        detectors: {
+          languages: args.language ? [args.language] : [],
+        },
+        capabilities: [
+          {
+            name: 'execute',
+            description: args.description,
+            inputSchema: {
+              type: 'object',
+              properties: {},
+            },
+          },
+        ],
+      };
+
+      await fs.writeFile(path.join(skillPath, 'manifest.json'), JSON.stringify(manifest, null, 2));
+      await fs.writeFile(path.join(skillPath, 'prompt.md'), args.prompt);
+
+      return {
+        content: [
+          { type: 'text', text: `Skill '${args.name}' added successfully to local registry.` },
+        ],
+      };
+    }
+
+    const skillLocations = await syncEngine.listCachedSkills();
+    const skillLoc = skillLocations.find((loc) => loc.manifest.name === request.params.name);
+
+    if (!skillLoc) {
       throw new Error(`Skill ${request.params.name} not found`);
     }
 
@@ -67,16 +131,20 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
     const projectPath = (args.projectPath as string) || process.cwd();
     const stack = await projectDetector.detect(projectPath);
 
-    const result = await skillEngine.executeSkill(skill, {
-      projectPath,
-      projectStack: stack,
-      args: args,
-    });
+    const result = await skillEngine.executeSkill(
+      skillLoc.manifest,
+      {
+        projectPath,
+        projectStack: stack,
+        args: args,
+      },
+      skillLoc.path,
+    );
 
     return {
       content: [
         {
-          type: "text",
+          type: 'text',
           text: JSON.stringify(result.data, null, 2),
         },
       ],
@@ -85,7 +153,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
     return {
       content: [
         {
-          type: "text",
+          type: 'text',
           text: `Error: ${error.message}`,
         },
       ],
@@ -113,14 +181,14 @@ async function main() {
       }
     }
   } catch (error) {
-    console.error("Failed to load application configuration:", error);
+    console.error('Failed to load application configuration:', error);
   }
 
   await server.connect(transport);
-  console.error("Architect Guardian MCP Server running on stdio");
+  console.error('Architect Guardian MCP Server running on stdio');
 }
 
 main().catch((error: any) => {
-  console.error("Server error:", error);
+  console.error('Server error:', error);
   process.exit(1);
 });

@@ -1,7 +1,7 @@
-import { Client } from "@modelcontextprotocol/sdk/client/index.js";
-import { StdioClientTransport } from "@modelcontextprotocol/sdk/client/stdio.js";
-import { join } from "path";
-import * as vscode from "vscode";
+import { Client } from '@modelcontextprotocol/sdk/client/index.js';
+import { StdioClientTransport } from '@modelcontextprotocol/sdk/client/stdio.js';
+import { join } from 'path';
+import * as vscode from 'vscode';
 
 export class MCPServerManager {
   private client: Client | undefined;
@@ -14,21 +14,21 @@ export class MCPServerManager {
       return this.client;
     }
 
-    const config = vscode.workspace.getConfiguration("architectGuardian");
-    let serverPath = config.get<string>("serverPath");
+    const config = vscode.workspace.getConfiguration('architectGuardian');
+    let serverPath = config.get<string>('serverPath');
 
     if (!serverPath) {
       // Self-contained path within the extension bundle
-      serverPath = join(this.context.extensionPath, "dist-server", "index.cjs");
+      serverPath = join(this.context.extensionPath, 'dist-server', 'index.cjs');
     }
 
     this.transport = new StdioClientTransport({
-      command: "node",
+      command: 'node',
       args: [serverPath],
     });
 
     this.client = new Client(
-      { name: "architect-guardian-client", version: "0.1.0" },
+      { name: 'architect-guardian-client', version: '0.1.0' },
       { capabilities: {} },
     );
 

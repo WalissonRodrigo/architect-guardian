@@ -1,6 +1,6 @@
 import * as fs from 'fs/promises';
-import * as path from 'path';
 import * as os from 'os';
+import * as path from 'path';
 
 export interface CacheEntry<T> {
   value: T;
@@ -12,7 +12,8 @@ export class CacheManager {
   private ttlMs: number;
   private memoryCache: Map<string, CacheEntry<any>> = new Map();
 
-  constructor(ttlMs: number = 60 * 60 * 1000) { // Default 1 hour TTL
+  constructor(ttlMs: number = 60 * 60 * 1000) {
+    // Default 1 hour TTL
     this.ttlMs = ttlMs;
     this.cacheDir = path.join(os.homedir(), '.architect-guardian', 'cache');
   }
@@ -45,7 +46,7 @@ export class CacheManager {
         return entry.value;
       } else {
         // Clean up expired cache
-        await fs.unlink(filePath).catch(() => { });
+        await fs.unlink(filePath).catch(() => {});
         this.memoryCache.delete(key);
       }
     } catch (error) {
@@ -58,7 +59,7 @@ export class CacheManager {
   async set<T>(key: string, value: T): Promise<void> {
     const entry: CacheEntry<T> = {
       value,
-      timestamp: Date.now()
+      timestamp: Date.now(),
     };
 
     // 1. Set memory cache
@@ -80,17 +81,21 @@ export class CacheManager {
       try {
         const sanitizedKey = key.replace(/[^a-z0-9]/gi, '_').toLowerCase();
         await fs.unlink(path.join(this.cacheDir, `${sanitizedKey}.json`));
-      } catch (e) { }
+      } catch (e) {
+        // Empty block
+      }
     } else {
       this.memoryCache.clear();
       try {
         const files = await fs.readdir(this.cacheDir);
         await Promise.all(
           files
-            .filter(file => file.endsWith('.json'))
-            .map(file => fs.unlink(path.join(this.cacheDir, file)))
+            .filter((file) => file.endsWith('.json'))
+            .map((file) => fs.unlink(path.join(this.cacheDir, file))),
         );
-      } catch (e) { }
+      } catch (e) {
+        // Empty block
+      }
     }
   }
 
