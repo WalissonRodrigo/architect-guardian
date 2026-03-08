@@ -13,9 +13,10 @@ jobs:
     name: Nightly Integration Test
     runs-on: ${{ matrix.os }}
     strategy:
+      fail-fast: false
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
-        node: [20, 21]
+        os: [ubuntu-latest, windows-latest]
+        node: [20, 22]
     
     steps:
       - name: Checkout
@@ -36,11 +37,10 @@ jobs:
       - name: Test on ${{ matrix.os }}
         run: npm test
       
-      - name: Notify on failure
+      - name: Notify Discord on failure
         if: failure()
-        uses: 8398a7/action-slack@v3
+        uses: rjstone/discord-webhook-notify@v1
         with:
-          status: ${{ job.status }}
-          channel: '#alerts'
-        env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          severity: error
+          details: Nightly Build Failed!
+          webhookUrl: ${{ secrets.DISCORD_WEBHOOK_URL }}
