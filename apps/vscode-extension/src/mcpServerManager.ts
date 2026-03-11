@@ -22,9 +22,15 @@ export class MCPServerManager {
       serverPath = join(this.context.extensionPath, 'dist-server', 'index.cjs');
     }
 
+    console.log(`Starting MCP Server from: ${serverPath}`);
+
     this.transport = new StdioClientTransport({
       command: 'node',
       args: [serverPath],
+      env: {
+        ...process.env,
+        ELECTRON_RUN_AS_NODE: '1',
+      },
     });
 
     this.client = new Client(
@@ -32,7 +38,13 @@ export class MCPServerManager {
       { capabilities: {} },
     );
 
-    await this.client.connect(this.transport);
+    try {
+      await this.client.connect(this.transport);
+      console.log('MCP Server connected successfully');
+    } catch (error) {
+      console.error('Failed to connect to MCP Server:', error);
+      throw error;
+    }
     return this.client;
   }
 

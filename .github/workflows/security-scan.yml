@@ -3,6 +3,8 @@ name: Security and Quality Scan
 on:
   push:
     branches: [ main, develop ]
+    tags:
+      - 'v*'
   pull_request:
     branches: [ main, develop ]
   schedule:

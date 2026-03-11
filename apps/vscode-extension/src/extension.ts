@@ -95,6 +95,9 @@ export async function activate(context: vscode.ExtensionContext) {
 
   healthDashboard = new HealthDashboardProvider(context, serverManager);
 
+  // Auto-start server on activation
+  vscode.commands.executeCommand('architectGuardian.startServer');
+
   // Open Dashboard Command
   context.subscriptions.push(
     vscode.commands.registerCommand('architectGuardian.openDashboard', () =>
